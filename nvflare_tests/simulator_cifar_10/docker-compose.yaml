@@ -17,4 +17,12 @@ services:
       - ./app/data:/workspace/my-workspace/data
     ports:
       - "6006:6006"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      stack:
+        soft: 67108864
+        hard: 67108864
+    ipc: "host"
     command: bash -c "while true; do echo hello-world; sleep 2; done"
