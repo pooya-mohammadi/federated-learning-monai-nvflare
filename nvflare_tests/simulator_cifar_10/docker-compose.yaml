@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  simulater_cifar_10:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ./app/data:/workspace/my-workspace/data
+    ports:
+      - "6006:6006"
+    command: bash -c "while true; do echo hello-world; sleep 2; done"
