@@ -9,17 +9,19 @@ cd container_ex1
 docker build -t nvflare-pt:latest -f Dockerfile .
 ```
 
-Then, run the dockerfile run the following code:
+Then, run the docker-compose using the following code:
 ```commandline
-cd nvflare_tests
-mkdir my-workspace 
-# or create a folder using windows graphical interface.
-docker run --rm -it --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -v ./my-workspace:/workspace/my-workspace -w /workspace/my-workspace nvflare-pt:latest
+cd nvflare_tests/simulator_cifar_10
+docker-compose up --build
+```
+It will print `hello-world` at each second. Open a new terminal and run the following command:
+```commandline
+docker-compose exec -it simulater_cifar_10 bash
 ```
 
 You should be able to see something like the following:
 ```commandline
-root@c578dc34ca69:/workspace/my-workspace#
+root@c578dc34ca69:/workspace#
 ```
 
 ## Check nvflare installation
@@ -71,17 +73,18 @@ cp -rf /workspace/NVFlare/examples/hello-pt-tb simulator-example/
 mkdir simulator-example/workspace
 ```
 
-Considering that I live in Iran and the internet connection is so slow, I've downloaded the cifar-10 dataset from the following address, and copied it to the `my-workspace/data` folder.
+Considering that I live in Iran and the internet connection is so slow, 
+I downloaded the cifar-10 dataset from the following address, and copied it to the `nvflare_tests/simulator_cifar_10/app/data` folder.
 1) Download address: https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
-2) Copy the downloaded file to the `my-workspace/data` folder.
-3) Then add the following argument to the `config_fed_client.json` to introduce the dataset path:
+2) Copy the downloaded file to the `nvflare_tests/simulator_cifar_10/app/data` folder.
+3) Then add the following argument to the `config_fed_client.json` to introduce the dataset path and prevent the container from downloading the dataset:
 ```commandline
 nano simulator-example/hello-pt-tb/app/config/config_fed_client.json
 # Add the following line under the `args` section of `components` and `pt_learner.PTLearner`
 "data_path": "/workspace/my-workspace/data"
 ```
 
-Then run the docker file and run the following command:
+Then run the following command which creates two sites for training.
 ```commandline
 nvflare simulator -w simulator-example/workspace -n 2 -t 2 simulator-example/hello-pt-tb
 ```
@@ -91,3 +94,8 @@ After the training is done run the following:
 tensorboard --logdir simulator-example/workspace/simulate_job/tb_events/
 ```
 
+In your local system browse the following link:
+http://localhost:6006/
+
+You should be able to see the training logs based on different sites:
+![img.png](img.png)
