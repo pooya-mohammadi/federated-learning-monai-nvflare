@@ -1,0 +1,76 @@
+version: "3.8"
+services:
+  breast-cancer-server:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      args:
+        - server_fqdn=localhost
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=
+    volumes:
+      - ./app/data:/workspace/my-workspace/data
+      - ./result_server:/result
+      - ./app/checkpoints:/opt/torch/hub/checkpoints
+    ports:
+      - "6006:6006"
+      - "8002:8002"
+      - "8003:8003"
+    shm_size: '1gb'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      stack:
+        soft: 67108864
+        hard: 67108864
+    ipc: "host"
+    networks:
+      - host
+    # This is for debuge
+    command: bash -c "while true; do echo hello-world; sleep 2; done"
+#    command: "/code/start_server.sh; /code/finalize_server.sh"
+
+  breast-cancer-client-1:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      args:
+        - server_fqdn=breast-cancer-server
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+    volumes:
+      - ./app/data:/data
+      - ./result_server:/result
+      - ./app/checkpoints:/opt/torch/hub/checkpoints
+    ports:
+      - "6007:6006"
+    shm_size: '1gb'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      stack:
+        soft: 67108864
+        hard: 67108864
+#    ipc: "host"
+    networks:
+      - host
+    # This is for debuge
+    command: bash -c "while true; do echo hello-world; sleep 2; done"
+#    command: "/code/start_site-1.sh; tail -f /dev/null"
+networks:
+  host:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.198.0.0/16
+          ip_range: 10.198.10.0/24
+          gateway: 10.198.10.1
