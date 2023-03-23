@@ -147,3 +147,20 @@ tensorboard --logdir=${RESULT_ROOT}
 
 Browse to http://localhost:6006 to video the training graphs:
 ![img_1.png](img_1.png)
+
+## FedAvg Training
+8 clients will run 4 local runs at each step. There are 50 steps or local runs.
+```commandline
+./set_alpha.sh cifar10_fedavg 1.0
+nvflare simulator job_configs/cifar10_fedavg --workspace ${RESULT_ROOT}/fedavg_alpha1.0 --threads 8 --n_clients 8
+./set_alpha.sh cifar10_fedavg 0.5
+nvflare simulator job_configs/cifar10_fedavg --workspace ${RESULT_ROOT}/fedavg_alpha0.5 --threads 8 --n_clients 8
+./set_alpha.sh cifar10_fedavg 0.3
+nvflare simulator job_configs/cifar10_fedavg --workspace ${RESULT_ROOT}/fedavg_alpha0.3 --threads 8 --n_clients 8
+./set_alpha.sh cifar10_fedavg 0.1
+nvflare simulator job_configs/cifar10_fedavg --workspace ${RESULT_ROOT}/fedavg_alpha0.1 --threads 8 --n_clients 8
+```
+
+I only ran the first job and this is the result I got:
+![img_2.png](img_2.png)
+The output is comparable to centralized training.
