@@ -99,3 +99,51 @@ http://localhost:6006/
 
 You should be able to see the training logs based on different sites:
 ![img.png](img.png)
+
+
+# Experiment with https://github.com/NVIDIA/NVFlare/tree/main/examples/cifar10/cifar10-sim
+Start the project:
+```commandline
+docker-compose up
+```
+In another terminal run the following:
+```commandline
+docker-compose exec -it simulator_cifar_10 bash
+```
+Move data: 
+```commandline
+cp /workspace/my-workspace/data/cifar-10-python.tar.gz /tmp/cifar10/cifar-10-python.tar.gz
+```
+
+Get on `main` branch:
+```commandline
+cd /workspace/NVFlare
+git checkout mian
+```
+
+Extract data:
+```commandline
+cd examples/cifar10/cifar10-sim/
+python ../pt/utils/cifar10_download_data.py
+```
+
+Set output root dir and python path: In the json files the codes are referenced from `pt` folder. 
+By adding the pt folder to PYTHONPATH, it will be used in the process of recognizing python files mentioned in client json file. 
+```commandline 
+export PYTHONPATH=/workspace/NVFlare/examples/cifar10
+export RESULT_ROOT=/tmp/nvflare/sim_cifar10
+```
+
+## Centralized training
+```commandline
+./set_alpha.sh cifar10_central 0.0
+nvflare simulator job_configs/cifar10_central --workspace ${RESULT_ROOT}/central --threads 1 --n_clients 1
+```
+
+Run tensorboard:
+```commandline
+tensorboard --logdir=${RESULT_ROOT}
+```
+
+Browse to http://localhost:6006 to video the training graphs:
+![img_1.png](img_1.png)
