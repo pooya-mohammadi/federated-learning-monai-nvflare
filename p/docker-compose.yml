@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  port-service:
+    image: alpine
+    command: sh -c "nc -l -p 1234; while true; do echo hello-world; sleep 2; done"
+    ports:
+      - "1234:1234"
+
+  telnet-service:
+    image: alpine
+    command: sh -c "apk add --no-cache busybox-extras && sleep 5 && telnet port-service 1234; while true; do echo hello-world; sleep 2; done"
+
+
+docker run --gpus="device=" --network=host --ipc=host --rm --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --name=server -e NVIDIA_VISIBLE_DEVICES="" -v "./result_server":/result -w /code monai-nvflare:latest /bin/bash -c "/code/start_server.sh; /code/finalize_server.sh"
+
+
+docker run --gpus="device=0" --network=host --ipc=host --rm --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --name="site-1" -e NVIDIA_VISIBLE_DEVICES="0" -v "C:\Users\pooya\projects\federated-learning-monai-nvflare\monai_nvflare\breast-cancer-test\app\data":/data:ro -v "C:\Users\pooya\projects\federated-learning-monai-nvflare\monai_nvflare\breast-cancer-test\app\checkpoints":/opt/torch/hub/checkpoints -w /code monai-nvflare:latest /bin/bash -c "/code/start_site-1.sh; tail -f /dev/null"
+docker run --gpus="device=0" --network=host --ipc=host --rm --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --name="site-2" -e NVIDIA_VISIBLE_DEVICES="0" -v "C:\Users\pooya\projects\federated-learning-monai-nvflare\monai_nvflare\breast-cancer-test\app\data":/data:ro -v "C:\Users\pooya\projects\federated-learning-monai-nvflare\monai_nvflare\breast-cancer-test\app\checkpoints":/opt/torch/hub/checkpoints -w /code monai-nvflare:latest /bin/bash -c "/code/start_site-2.sh; tail -f /dev/null"
+docker run --gpus="device=0" --network=host --ipc=host --rm --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --name="site-3" -e NVIDIA_VISIBLE_DEVICES="0" -v "C:\Users\pooya\projects\federated-learning-monai-nvflare\monai_nvflare\breast-cancer-test\app\data":/data:ro -v "C:\Users\pooya\projects\federated-learning-monai-nvflare\monai_nvflare\breast-cancer-test\app\checkpoints":/opt/torch/hub/checkpoints -w /code monai-nvflare:latest /bin/bash -c "/code/start_site-3.sh; tail -f /dev/null"
